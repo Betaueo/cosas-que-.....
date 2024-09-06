@@ -12,11 +12,11 @@ const loveMessages = [
     "Tu sentido del humor me hace reír más de lo que debería",
     "Tu sentido del humor me hace reír y me encanta",
     "Amo cómo me enseñas a ver el mundo de una manera distinta",
-    "Me gusta que pienses de diferente manera como de una forma adulta",
-    "Amo tu nariz es una de las caracteristicas que me gusta",
-    "Me encanta tus labios suaves y delgaditos",
-    "Esto no tiene nada que ver pero tu eres mala conmigo a veces",
-    "Me gusta cómo haces que cada error sea una historia divertida para contarr",
+    "Me gusta que pienses diferente (como de una forma adulta)",
+    "Amo tu nariz, es una de las características que me gusta",
+    "Me encantan tus labios suaves y delgaditos",
+    "Esto no tiene nada que ver pero tú eres mala conmigo a veces",
+    "Me gusta cómo haces que cada error sea una historia divertida para contar",
     "Me encanta cómo tus abrazos siempre parecen ser el tamaño perfecto"
 ];
 
@@ -30,13 +30,18 @@ if (!currentMessageIndex || lastShownDate !== today) {
     currentMessageIndex = Math.floor(Math.random() * loveMessages.length);
     localStorage.setItem('currentMessageIndex', currentMessageIndex);
     localStorage.setItem('lastShownDate', today);
+
+    // Mostrar el video de confeti la primera vez que se muestra un nuevo mensaje
+    showConfettiVideo();
 }
 
+// Función para mostrar el mensaje actual
 function displayCurrentMessage() {
     const messageElement = document.getElementById('love-message');
     messageElement.textContent = loveMessages[currentMessageIndex];
 }
 
+// Función para manejar el clic en "Siguiente mensaje"
 function nextMessage() {
     alert("Solo puedes ver un mensaje por día. ¡Vuelve mañana para ver el próximo MI AMOR 😘!");
 }
@@ -54,16 +59,41 @@ function updateBackground() {
     const background = document.getElementById('background-selector').value;
     document.body.className = background;
     localStorage.setItem('background', background);
-    adjustBackground(); // Ajusta el fondo después de cambiarlo
 }
 
-function adjustBackground() {
-    const body = document.body;
+// Función para mostrar el video de confeti
+function showConfettiVideo() {
+    const videoOverlay = document.getElementById('video-overlay');
+    videoOverlay.classList.remove('hidden');
 
-    // Ajustar el tamaño del fondo en función del tamaño de la pantalla
-    body.style.backgroundSize = 'cover'; // Hace que la imagen de fondo cubra todo el cuerpo
-    body.style.backgroundPosition = 'center'; // Centra la imagen de fondo
-    body.style.backgroundAttachment = 'fixed'; // Mantiene la imagen fija al hacer scroll
+    const video = document.getElementById('confetti-video');
+    video.play();
+
+    // Ocultar el video después de que termine
+    video.onended = () => {
+        videoOverlay.classList.add('hidden');
+    };
+}
+
+// Función para activar el Modo Oscuro basado en la hora
+function activateDarkMode() {
+    const hour = new Date().getHours();
+    if (hour >= 19 || hour < 7) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+}
+
+// Función para ajustar el brillo del personaje en el fondo
+function adjustCharacterBrightness() {
+    const background = document.body.className;
+    const widget = document.querySelector('.widget');
+
+    // Ajustar el brillo para personajes específicos en modo oscuro
+    if (background === 'snoopycor' || background === 'snoopyflo' || background === 'snoopylov') {
+        widget.setAttribute('data-background', background);
+    }
 }
 
 // Configurar eventos y restaurar preferencias guardadas
@@ -77,16 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedThemeColor = localStorage.getItem('themeColor');
     if (savedThemeColor) {
         document.getElementById('theme-color').value = savedThemeColor;
-        updateThemeColor();
+        document.querySelector('h2').style.color = savedThemeColor;
+        document.querySelector('button').style.backgroundColor = savedThemeColor;
     }
 
     const savedBackground = localStorage.getItem('background');
     if (savedBackground) {
         document.getElementById('background-selector').value = savedBackground;
-        updateBackground();
+        document.body.className = savedBackground;
     }
 
-    adjustBackground(); // Ajusta el fondo al cargar la página
-
-    window.addEventListener('resize', adjustBackground); // Ajustar el fondo al cambiar el tamaño de la ventana
+    // Activar el Modo Oscuro y ajustar el brillo del personaje
+    activateDarkMode();
+    adjustCharacterBrightness();
 });
